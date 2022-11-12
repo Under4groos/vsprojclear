@@ -10,10 +10,11 @@ namespace vsprojclear
 {
     internal class Program
     {
+        static string pattern_regex = @"(\.xml)|(\.pdb)|(\.lib)|(\.config)|(\.exp)".ToLower();
+
         static void Main(string[] args)
         {
 
-            string pattern_regex = @"(\.xml)|(\.pdb)|(\.lib)|(\.config)".ToLower();
 
             while (true)
             {
@@ -30,20 +31,10 @@ namespace vsprojclear
 
             if (args[0].ToUpper() == "-C" && Directory.Exists(args[1]))
             {
-                FileInfo fileInfo;
-                foreach (var item in Directory.GetFiles(args[1]))
+                ClearFiles(args[1]);
+                foreach (string dir in Directory.GetDirectories(args[1]))
                 {
-                    fileInfo = new FileInfo(item);
-
-                    if(Regex.IsMatch(fileInfo.Extension.ToLower() , pattern_regex))
-                    {
-                        File.Delete(item);
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(fileInfo.Name);
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
-
-
+                    ClearFiles(dir);
                 }
             }
 
@@ -57,6 +48,23 @@ namespace vsprojclear
             }
 
            
+        }
+        static void ClearFiles( string directory )
+        {
+            if (!Directory.Exists(directory))
+                return;
+            FileInfo fileInfo;
+            foreach (var item in Directory.GetFiles(directory))
+            {
+                fileInfo = new FileInfo(item);
+                if (Regex.IsMatch(fileInfo.Extension.ToLower(), pattern_regex))
+                {
+                    File.Delete(item);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(fileInfo.Name);
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+            }
         }
     }
 }
